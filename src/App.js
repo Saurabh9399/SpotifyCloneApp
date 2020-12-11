@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import "./App.css";
 import Login from "./Login";
 import { getTokenFromUrl } from "./spotify";
@@ -11,7 +11,7 @@ const spotify = new SpotifyWebApi();
 function App() {
   //Run code based on given condition
   
-  const [{ user,token }, dispatch] = useDataLayerValue();
+  const [{ user , token }, dispatch] = useDataLayerValue();
 
   useEffect(() => {
     const hash = getTokenFromUrl();
@@ -33,10 +33,38 @@ function App() {
           user:user,
         });
       });
+
+       spotify.getMyTopArtists().then((response) =>
+         dispatch({
+           type: "SET_TOP_ARTISTS",
+           top_artists: response,
+         })
+       );
+
+       dispatch({
+         type: "SET_SPOTIFY",
+         spotify: spotify,
+       });
+
+
+
+      spotify.getUserPlaylists().then((playlists) =>{
+        dispatch({
+          type:"SET_PLAYLISTS",
+          playlists:playlists,
+        });
+      });
+      spotify.getPlaylist("37i9dQZEVXcELTB8EBBQBh").then((response) =>
+        dispatch({
+          type: "SET_DISCOVER_WEEKLY",
+          discover_weekly: response,
+        })
+      );
+
     }
 
     console.log("I HAVE A TOKEN 👉 ", token);
-  }, []);
+  }, [token,dispatch]);
 
  console.log('👾',user );
  console.log('👽' , token);
